@@ -55,6 +55,9 @@ void AShooterSamCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	OnTakeAnyDamage.AddDynamic(this, &AShooterSamCharacter::OnDamageTaken);
+	Health = MaxHealth;
+
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
 
 	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
@@ -63,6 +66,7 @@ void AShooterSamCharacter::BeginPlay()
 	{
 		Gun->SetOwner(this);
 		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+		Gun->OwnerController = GetController();
 	}
 	else
 	{
@@ -160,4 +164,21 @@ void AShooterSamCharacter::DoJumpEnd()
 void AShooterSamCharacter::Shoot()
 {
 	if(Gun)Gun->PullTrigger();
+}
+
+void AShooterSamCharacter::OnDamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+
+	if (IsAlive) {
+		UE_LOG(LogTemp, Warning, TEXT("'%s' took %f damage from '%s'"), *GetNameSafe(DamagedActor), Damage, *GetNameSafe(DamageCauser));
+		Health -= Damage;
+		if (Health <= 0.0f )
+		{
+			IsAlive = false;
+			Health = 0.0f;
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			UE_LOG(LogTemp, Warning, TEXT("'%s' has died!"), *GetNameSafe(DamagedActor));
+		}
+
+	}
 }
