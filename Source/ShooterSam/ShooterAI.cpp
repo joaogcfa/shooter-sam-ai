@@ -7,12 +7,39 @@
 void AShooterAI::BeginPlay()
 {
 	Super::BeginPlay();
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	
+}
 
+void AShooterAI::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	/*APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	if (PlayerPawn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Pawn: %s and location: %s"), *PlayerPawn->GetName(), *PlayerPawn->GetActorLocation().ToString());
-		SetFocus(PlayerPawn);
-	}
+		if (LineOfSightTo(PlayerPawn)) 
+		{
+			SetFocus(PlayerPawn);
+			MoveToActor(PlayerPawn, 200.0f);
+		}
+		else {
+			ClearFocus(EAIFocusPriority::Gameplay);
+			StopMovement();
+		}
+	}*/
+}
 
+void AShooterAI::StartBehaviorTree(AShooterSamCharacter* Player)
+{
+	if (EnemyAIBehaviorTree)
+	{
+		MyCharacter = Cast<AShooterSamCharacter>(GetPawn());
+
+		if(Player)
+		{
+			PlayerCharacter = Player;
+		}
+
+
+		RunBehaviorTree(EnemyAIBehaviorTree);
+	}
 }
